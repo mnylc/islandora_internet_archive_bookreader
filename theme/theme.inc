@@ -20,7 +20,7 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
   $search_uri = module_exists('islandora_solr') ? url("internet_archive_bookreader_search/{$object->id}/TERM", array('absolute' => TRUE)) : NULL;
   $backup_uris = variable_get('islandora_internet_archive_bookreader_use_backup_dsid', FALSE);
   $perbook_view_mode = islandora_paged_content_get_viewing_hint($object);
-  if (isset($perbook_view_mode) {
+  if (isset($perbook_view_mode)) {
     $view_mode = $perbook_view_mode == 'paged' ? 2 : 1;
   } 
   else {
