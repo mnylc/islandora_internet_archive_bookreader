@@ -10,6 +10,7 @@
  */
 function template_preprocess_islandora_internet_archive_bookreader(array &$variables) {
   module_load_include('inc', 'islandora_internet_archive_bookreader', 'includes/utilities');
+  module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   module_load_include('inc', 'islandora', 'includes/authtokens');
   $object = $variables['object'];
   $dsid = $variables['datastream_id'];
@@ -18,7 +19,16 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
   $module_path = drupal_get_path('module', 'islandora_internet_archive_bookreader');
   $search_uri = module_exists('islandora_solr') ? url("internet_archive_bookreader_search/{$object->id}/TERM", array('absolute' => TRUE)) : NULL;
   $backup_uris = variable_get('islandora_internet_archive_bookreader_use_backup_dsid', FALSE);
-
+  $perbook_view_mode = islandora_paged_content_get_viewing_hint($object);
+  if (isset($perbook_view_mode) {
+    $view_mode = $perbook_view_mode == 'paged' ? 2 : 1;
+  } 
+  else {
+    // Defaults to global viewer config
+    $view_mode = (int) variable_get('islandora_internet_archive_bookreader_default_page_view', 1);
+  }
+  $hasCover = islandora_paged_content_get_hascover($object) == 'true' ? TRUE : FALSE;
+  
   $pages = array();
   foreach ($variables['pages'] as $page_pid => $info) {
     $addendum = $backup_uris ? array('pid' => $page_pid) : array(
@@ -49,10 +59,11 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
       'pages' => $pages,
       'pageCount' => count($pages),
       'overlayOpacity' => variable_get('islandora_internet_archive_bookreader_overlay_opacity', '0.5'),
-      'mode' => (int) variable_get('islandora_internet_archive_bookreader_default_page_view', 1),
+      'mode' => $view_mode,
       'mobilize' => variable_get('islandora_internet_archive_bookreader_mobile_full_screen', FALSE),
       'content_type' => variable_get('islandora_internet_archive_bookreader_content_type', 'book'),
       'useBackupUri' => $backup_uris,
+      'hasCover' => $hasCover,
     ),
   );
 
