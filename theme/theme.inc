@@ -22,13 +22,13 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
   $perbook_view_mode = islandora_paged_content_get_viewing_hint($object);
   if (isset($perbook_view_mode)) {
     $view_mode = $perbook_view_mode == 'paged' ? 2 : 1;
-  } 
+  }
   else {
-    // Defaults to global viewer config
+    // Defaults to global viewer config.
     $view_mode = (int) variable_get('islandora_internet_archive_bookreader_default_page_view', 1);
   }
   $hasCover = islandora_paged_content_get_hascover($object) == 'true' ? TRUE : FALSE;
-  
+
   $pages = array();
   foreach ($variables['pages'] as $page_pid => $info) {
     $addendum = $backup_uris ? array('pid' => $page_pid) : array(
@@ -106,7 +106,7 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
     'weight' => -6,
   ));
   // Use a newer version of color box as the version bundled with BookReader
-  // won't work with JQuery 1.4.4
+  // won't work with JQuery 1.4.4.
   drupal_add_js("$colorbox_path/jquery.colorbox-min.js", array(
     'group' => JS_LIBRARY,
     'weight' => -6,
@@ -159,7 +159,7 @@ function theme_islandora_internet_archive_bookreader_book_info(array $variables)
   }
   else {
     $fields = islandora_internet_archive_bookreader_info_fields($object);
-    $convert_to_string = function($o) {
+    $convert_to_string = function ($o) {
       return implode('<br/>', $o);
     };
     $fields = array_map($convert_to_string, $fields);
@@ -171,7 +171,8 @@ function theme_islandora_internet_archive_bookreader_book_info(array $variables)
       'colgroups' => array(),
       'header' => array(t('Field'), t('Values')),
       'rows' => $rows,
-      'sticky' => FALSE));
+      'sticky' => FALSE,
+    ));
   }
   return $content;
 }
@@ -212,12 +213,12 @@ function islandora_internet_archive_bookreader_info_fields(AbstractObject $objec
   );
   $xml = simplexml_load_string($object['MODS']->content);
   $xml->registerXPathNamespace('mods', 'http://www.loc.gov/mods/v3');
-  $to_string = function($o) {
+  $to_string = function ($o) {
     return (string) $o;
   };
   // Query each context node with the given xpath.
   $query_each_context = function (array $contexts, $xpath) {
-    $query = function(&$context, $key, $xpath) {
+    $query = function (&$context, $key, $xpath) {
       $context->registerXPathNamespace('mods', 'http://www.loc.gov/mods/v3');
       $context = $context->xpath($xpath);
     };
@@ -228,7 +229,7 @@ function islandora_internet_archive_bookreader_info_fields(AbstractObject $objec
   };
   // Query the given xpath. If the xpath is any array the first value is the
   // xpath for the context node(s) and the second the path to the value fields.
-  $query = function(SimpleXMLElement $xml, $xpath) use(&$query_each_context) {
+  $query = function (SimpleXMLElement $xml, $xpath) use (&$query_each_context) {
     return is_string($xpath) ? $xml->xpath($xpath) : $query_each_context($xml->xpath($xpath[0]), $xpath[1]);
   };
   foreach ($fields as $label => $xpath) {
