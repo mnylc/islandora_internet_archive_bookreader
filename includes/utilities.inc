@@ -15,8 +15,8 @@ function islandora_internet_archive_bookreader_remap_highlighting_for_bookreader
   $results = array(
     'matches' => array(),
   );
-
   foreach ($original_results as $pid => $info) {
+ 
     foreach ($info['snippets'] as $snippet => $bounding_boxes) {
       $match = array(
         'text' => preg_replace('/[^a-zA-Z0-9-\n {}]/', '', $snippet),
@@ -27,6 +27,10 @@ function islandora_internet_archive_bookreader_remap_highlighting_for_bookreader
           ),
         ),
       );
+
+      // info['page']['width'] (Integer) 2618
+      // info['page']['height] (Integer) 3369
+
 
       foreach ($bounding_boxes as $bounding_box) {
         $match['par'][0]['boxes'][] = array(

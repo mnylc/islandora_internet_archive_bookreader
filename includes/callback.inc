@@ -62,6 +62,7 @@ function islandora_internet_archive_bookreader_search_callback($object_id, $term
   module_load_include('inc', 'islandora_paged_content', 'includes/highlighting');
   module_load_include('inc', 'islandora_internet_archive_bookreader', 'includes/utilities');
   if (!module_exists('islandora_solr')) {
+    dpm('Solr does not exist!');
     drupal_exit();
   }
 
