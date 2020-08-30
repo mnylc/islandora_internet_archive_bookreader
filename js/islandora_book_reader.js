@@ -433,7 +433,7 @@
       '.bookmark': Drupal.t('Bookmark this page'),
       '.read': Drupal.t('Read this @content_type aloud', {'@content_type': this.content_type}),
       '.share': Drupal.t('Share this @content_type', {'@content_type': this.content_type}),
-      '.info': Drupal.t('Info'),
+      '.info': Drupal.t('Page Metadata'),
       '.full': Drupal.t('Show fullscreen'),
       '.book_up': Drupal.t('Page up'),
       '.book_down': Drupal.t('Page down'),
@@ -727,12 +727,81 @@
       '</div>'].join('\n'));
   }
 
-  /**
-   * Appends content onto the "Info" module dialog box.
+/**
+   * @param JInfoDiv DOM element. Appends info to this element
+   * Can be overridden or extended
    */
-  IslandoraBookReader.prototype.buildInfoDiv = function(jInfoDiv) {
-    $(this.settings.info).appendTo(jInfoDiv);
+IslandoraBookReader.prototype.buildInfoDiv = function(jInfoDiv) {
+
+	// Remove these legacy elements
+        jInfoDiv.find('.BRfloatBody, .BRfloatCover, .BRfloatFoot').remove();
+
+	// clear content
+        jInfoDiv.find('.BRfloatMeta').remove();
+	  jInfoDiv.append($("<div class=\"BRfloatMeta\"></div>"));
+          $pagewidth = $(window).width();
+    	  jInfoDiv.find('.BRfloatMeta').height(600);
+    	  jInfoDiv.find('.BRfloatMeta').width($pagewidth - 200);
+ 
+   	if (1 == this.mode) {
+	      	// Recent fix to correct issue with 2 page books
+	      	var hash_arr = this.oldLocationHash.split("/");
+	      	var index = hash_arr[1];
+	      	var pid = this.getPID(index-1);
+	      	$.get(this.getPageMetadataURI(pid),
+		    	function(data) {
+		        jInfoDiv.find('.BRfloatMeta').html("<a href=\"/islandora/object/" + pid + "\" target=\"_blank\"><img src=\"/islandora/object/" 
+			+ pid + "/datastream/TN\" height=\"100\"></a><br><strong>Page " + index + "</strong><HR>" + data);
+		});
+    	} else if (3 == this.mode) {
+      		jInfoDiv.find('.BRfloatMeta').html('<div><strong>' + Drupal.t('Page Metadata View not supported for this view.') + '</strong></div>');
+    	} else {
+	      	var twoPageText = $([
+	      		'<div class="textTop" style="font-size: 1.1em">',
+		 	'<div class="textLeft" style="padding: 10px"><p>Left page loading...</p></div>',
+		 	'<div class="textRight" style="padding: 10px"><p>Right page loading...</p></div>',
+	      		'</div>'].join('\n'));
+	      	jInfoDiv.find('.BRfloatMeta').html(twoPageText);
+	      	var indices = this.getSpreadIndices(this.currentIndex());
+	      	var left_pid = this.getPID(indices[0]);
+	      	var right_pid = this.getPID(indices[1]);
+	      	if(left_pid) {
+			$.get(this.getPageMetadataURI(left_pid),
+		      		function(data) {
+		        	jInfoDiv.find('.textLeft').html("<a href=\"/islandora/object/" + left_pid + "\" target=\"_blank\"><img src=\"/islandora/object/" 
+				+ left_pid + "/datastream/TN\" height=\"100\"></a><br><strong>Page " + (indices[0]+1) + "</strong><HR>" + data);
+		      	});
+	      	} else {
+			jInfoDiv.find('.textLeft').html("<HR>");
+		}
+	      	if(right_pid) {
+			$.get(this.getPageMetadataURI(right_pid),
+		      		function(data) {
+		        	jInfoDiv.find('.textRight').html("<a href=\"/islandora/object/" + right_pid + "\" target=\"_blank\"><img src=\"/islandora/object/" 
+				+ right_pid + "/datastream/TN\" height=\"100\" ></a><br><strong>Page " + (indices[1]+1) + "</strong><HR>" + data);
+		      	});
+	      	} else {
+		        jInfoDiv.find('.textRight').html("<HR>");
+		}
+	}
   }
+  
+  
+  
+  /**
+   * Get the URI to the text content for the given page object.
+   * This content will be displayed in the full text modal dialog box.
+   *
+   * @param string pid
+   *   The page object to fetch the text content from.
+   *
+   * @return string
+   *   The URI
+   */
+  IslandoraBookReader.prototype.getPageMetadataURI = function (pid) {
+    return this.settings.pageMetadataUri.replace('PID', pid);
+  }
+
 
   /**
    * Appends content onto the "Share" module dialog box.
