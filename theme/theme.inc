@@ -50,6 +50,7 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
       'label' => $object->label,
       'searchUri' => $search_uri,
       'textUri' => url('internet_archive_bookreader_text/PID', array('absolute' => TRUE)),
+      'pageMetadataUri' => url('internet_archive_bookreader_pagemetadata/PID', array('absolute' => TRUE)),
       'dimensionsUri' => url('internet_archive_bookreader_dimensions/PID', array('absolute' => TRUE)),
       'tokenUri' => url('internet_archive_bookreader_get_image_uri/PID', array('absolute' => TRUE)),
       'djatokaUri' => variable_get('islandora_paged_content_djatoka_url', 'http://localhost:8080/adore-djatoka'),

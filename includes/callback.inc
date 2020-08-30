@@ -48,6 +48,22 @@ function islandora_internet_archive_bookreader_text_callback(AbstractObject $obj
 }
 
 /**
+ * Prints the given page Metadata
+ *
+ * This function exits.
+ *
+ * @param AbstractObject $object
+ *   The page object whose OCR data-stream will be used for display.
+ */
+function islandora_internet_archive_bookreader_pagemetadata_callback(AbstractObject $object) {
+   
+  module_load_include('inc', 'islandora', 'includes/metadata');
+  $variables['metadata'] = islandora_retrieve_metadata_markup($object);
+  echo $variables['metadata'];
+  drupal_exit();
+}
+
+/**
  * Performs a solr search for the given term within the given book.
  *
  * Prints a JSON object repersenting the results.
