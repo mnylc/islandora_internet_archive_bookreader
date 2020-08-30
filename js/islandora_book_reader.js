@@ -553,6 +553,7 @@
       $('#colorbox').draggable({
         cancel: '.BRfloat > :not(.BRfloatHead)'
       });
+      self.buildInfoDiv($('#BRinfo'));
     }});
     jToolbar.find('.full_text').colorbox({inline: true, opacity: overlayOpacity, href: "#BRfulltext", onLoad: function() {
       self.autoStop(); self.ttsStop();
@@ -574,7 +575,6 @@
 
     $('<div style="display: none;"></div>').append(this.blankShareDiv()).append(this.blankInfoDiv()).append(this.blankFullTextDiv()).appendTo($('body'));
     $('#BRinfo .BRfloatTitle a').attr( {'href': this.bookUrl} ).text(this.bookTitle).addClass('title');
-    this.buildInfoDiv($('#BRinfo'));
     this.buildShareDiv($('#BRshare'));
   }
 
@@ -744,10 +744,17 @@ IslandoraBookReader.prototype.buildInfoDiv = function(jInfoDiv) {
     	  jInfoDiv.find('.BRfloatMeta').width($pagewidth - 200);
  
    	if (1 == this.mode) {
+                this.updateLocationHash();
 	      	// Recent fix to correct issue with 2 page books
-	      	var hash_arr = this.oldLocationHash.split("/");
+                if (typeof this.oldLocationHash === 'undefined') {
+                   this.updateLocationHash(); 
+                   var hash_arr = window.location.hash.split("/");
+                } 
+                else {
+                   var hash_arr = this.oldLocationHash.split("/");
+                }
 	      	var index = hash_arr[1];
-	      	var pid = this.getPID(index-1);
+	      	var pid = this.getPID(index);
 	      	$.get(this.getPageMetadataURI(pid),
 		    	function(data) {
 		        jInfoDiv.find('.BRfloatMeta').html("<a href=\"/islandora/object/" + pid + "\" target=\"_blank\"><img src=\"/islandora/object/" 
@@ -933,7 +940,7 @@ IslandoraBookReader.prototype.buildInfoDiv = function(jInfoDiv) {
     if (page_string != this.currentIndex() && page_string) {
       var param_data = this.fragmentFromParams(this.paramsFromCurrent()).split("/");
       param_data[1] = index;
-      newHash = '#' + replaceAll(',','/',param_data.toString());
+     newHash = '#' + replaceAll(',','/',param_data.toString());
     }
 
     // End bug fix.
